@@ -1,17 +1,15 @@
 import pygame
+from sys import exit
 
 pygame.init()
-size = (350, 400)
-screen = pygame.display.set_mode(size)
+win_size = width, height = 400, 600
+screen = pygame.display.set_mode(win_size)
+pygame.display.set_caption("Breakout Game")
 
-running = True
-while running:
+while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running = False
+            pygame.quit()
+            exit()
 
-    screen.fill((255, 255, 255))
-    pygame.draw.circle(screen, (0, 180, 200), (250, 250), 75)
-    pygame.display.flip()
-
-pygame.quit()
+    pygame.display.update()
