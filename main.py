@@ -19,11 +19,18 @@ class Paddle(pygame.sprite.Sprite):
         self.player_input()
 
 
+class Ball(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.image.load("assets/ball.png")
+        self.rect = self.image.get_rect(center=(width/2, height/2))
+
+
 class Tile(pygame.sprite.Sprite):
-    def __init__(self, color):
+    def __init__(self, color, pos):
         super().__init__()
         self.image = pygame.image.load(f"assets/tiles/{color}.png").convert_alpha()
-        self.rect = self.image.get_rect(topleft=(0, 0))
+        self.rect = self.image.get_rect(topleft=pos)
 
 
 pygame.init()
@@ -35,8 +42,17 @@ clock = pygame.time.Clock()
 paddle = pygame.sprite.GroupSingle()
 paddle.add(Paddle())
 
+ball = pygame.sprite.GroupSingle()
+ball.add(Ball())
+
 tiles_group = pygame.sprite.Group()
-tiles_group.add(Tile("blue"))
+tile_order = ["pink", "pink", "red", "red", "orange", "orange"]
+tile_width, tile_height = 64, 32
+
+for tile_index, tile_color in enumerate(tile_order):
+    for i in range(0, int(width/tile_width)):
+        tiles_group.add(Tile(tile_color, (i * tile_width, tile_index * tile_height)))
+
 
 while True:
     for event in pygame.event.get():
@@ -44,9 +60,12 @@ while True:
             pygame.quit()
             exit()
 
-    screen.fill("#562B08")
+    screen.fill("black")
+
     paddle.draw(screen)
     paddle.update()
+
+    ball.draw(screen)
     tiles_group.draw(screen)
 
     pygame.display.update()
