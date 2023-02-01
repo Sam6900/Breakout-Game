@@ -24,21 +24,43 @@ class Ball(pygame.sprite.Sprite):
         super().__init__()
         self.image = pygame.image.load("assets/ball.png")
         self.rect = self.image.get_rect(center=(width/2, height/2))
-        self.speed_x = 3
-        self.speed_y = 3
+        self.ball_speed = 3.5
+        self.speed_x = self.ball_speed
+        self.speed_y = self.ball_speed
 
-    def ball_movement(self):
+    def window_collision(self):
         if self.rect.right >= width:
-            self.speed_x = -3
+            self.speed_x = -self.ball_speed
         elif self.rect.left <= 0:
-            self.speed_x = 0
+            self.speed_x = self.ball_speed
         elif self.rect.top <= 0:
-            self.speed_y = 3
+            self.speed_y = self.ball_speed
         self.rect.x += self.speed_x
         self.rect.y += self.speed_y
 
+    def collision(self):
+        if self.rect.colliderect(paddle.sprite.rect):
+            self.speed_y = -self.ball_speed
+
+        # Check the collision between ball and tile
+        tiles_collision = pygame.sprite.spritecollide(self, tiles_group, False)
+        if tiles_collision:
+            tile = tiles_collision[0]
+            if self.rect.left <= tile.rect.right <= self.rect.right:  # Right
+                self.speed_x = self.ball_speed
+            elif self.rect.right >= tile.rect.left >= self.rect.left:  # Left
+                self.speed_x = -self.ball_speed
+            if self.rect.bottom >= tile.rect.top >= self.rect.top:  # Top
+                self.speed_y = -self.ball_speed
+            else:  # Bottom
+                self.speed_y = self.ball_speed
+
+            tile.kill()
+            tiles_group.remove(tile)
+
     def update(self):
-        self.ball_movement()
+        self.window_collision()
+        self.collision()
 
 
 class Tile(pygame.sprite.Sprite):
@@ -67,6 +89,7 @@ tile_width, tile_height = 64, 32
 for tile_index, tile_color in enumerate(tile_order):
     for i in range(0, int(width/tile_width)):
         tiles_group.add(Tile(tile_color, (i * tile_width, tile_index * tile_height)))
+
 
 while True:
     for event in pygame.event.get():
