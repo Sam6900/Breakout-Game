@@ -24,6 +24,21 @@ class Ball(pygame.sprite.Sprite):
         super().__init__()
         self.image = pygame.image.load("assets/ball.png")
         self.rect = self.image.get_rect(center=(width/2, height/2))
+        self.speed_x = 3
+        self.speed_y = 3
+
+    def ball_movement(self):
+        if self.rect.right >= width:
+            self.speed_x = -3
+        elif self.rect.left <= 0:
+            self.speed_x = 0
+        elif self.rect.top <= 0:
+            self.speed_y = 3
+        self.rect.x += self.speed_x
+        self.rect.y += self.speed_y
+
+    def update(self):
+        self.ball_movement()
 
 
 class Tile(pygame.sprite.Sprite):
@@ -53,7 +68,6 @@ for tile_index, tile_color in enumerate(tile_order):
     for i in range(0, int(width/tile_width)):
         tiles_group.add(Tile(tile_color, (i * tile_width, tile_index * tile_height)))
 
-
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -61,12 +75,13 @@ while True:
             exit()
 
     screen.fill("black")
+    tiles_group.draw(screen)
 
     paddle.draw(screen)
     paddle.update()
 
     ball.draw(screen)
-    tiles_group.draw(screen)
+    ball.update()
 
     pygame.display.update()
     clock.tick(60)
